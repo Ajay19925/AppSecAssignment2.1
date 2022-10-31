@@ -15,4 +15,8 @@ jobs:
       - name: Navigate to repository and execute build
         run: |
           cd ${{ github.workspace }}
+          cd GiftcardSite
+          python manage.py makemigrations LegacySite
+          python manage.py makemigrations
+          python manage.py migrate
       - run: echo "🍏 This job's status is ${{ job.status }}."
