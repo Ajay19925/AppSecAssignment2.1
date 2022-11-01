@@ -20,4 +20,5 @@ jobs:
           python manage.py makemigrations LegacySite
           python manage.py makemigrations
           python manage.py migrate
+          python3 manage.py test LegacySite
       - run: echo "🍏 This job's status is ${{ job.status }}."
