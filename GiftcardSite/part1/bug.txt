@@ -8,6 +8,31 @@ XSS (Cross-Site Scripting) Vulnerability:
 	Fix:
 	We have removed the safe tag in 'GiftcardSite\templates\item-single.html' (line 62) and 'GiftcardSite\templates\gift.html' (line 60).
 
+	Vulnerable code:
+	<p>Endorsed by {{director|safe}}!</p>
+
 	Vulnerable link (Get Request):
 	http://127.0.0.1:8000/buy.html?director=<script>alert('XSS Vulnerability Found')</script>
 	http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script> 
+
+SQL Injection:
+
+	By checking the code I found SQL injection vulnerability in 'use_card_view' function of views.py. Vulnerable code is present in 'GiftcardSite\LegacySite\views.py' (line 197)
+
+	Reason for the issue:
+	SQL injection is a code injection attack that allows an attacker to interface with the queries that an application makes to its database. Author doesn't handled the signature value of the gift card properly. 
+
+	Steps to reproduce:
+	Download a card from the site -> Modify the giftcard file (put inject query in signature part) -> navigate to 'http://127.0.0.1:8000/use.html' -> upload the modified giftcard file.
+	password will be displayed in the screen with respect to your injection query.
+
+	Fix:
+	We need to use parameterized query instead of a direct query. Below mentioned vulnerable code can replaced with
+	card_query = Card.objects.raw('select id from LegacySite_card where data = %s', signature)
+	to fix the vulnerability.
+
+	Vulnerable code:
+	card_query = Card.objects.raw('select id from LegacySite_card where data = \'%s\'' % signature)
+
+	Vulnerable payload:
+	sqlInjection.gftcrd
