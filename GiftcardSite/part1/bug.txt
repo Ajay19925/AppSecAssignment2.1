@@ -1,0 +1,13 @@
+XSS (Cross-Site Scripting) Vulnerability:
+
+	I found two XSS vulnerability in different part of the application. Vulnerable code in present in 'GiftcardSite\templates\item-single.html' (line 62) and 'GiftcardSite\templates\gift.html' (line 60).
+
+	Reason for the issue:
+	Author used safe tag in two different places. The main use of safe tag is to intidicate that the value is known to be dsafe and therefore doesnt need to be escaped. This let the attacker to inject script using parameter 'director'
+
+	Fix:
+	We have removed the safe tag in 'GiftcardSite\templates\item-single.html' (line 62) and 'GiftcardSite\templates\gift.html' (line 60).
+
+	Vulnerable link (Get Request):
+	http://127.0.0.1:8000/buy.html?director=<script>alert('XSS Vulnerability Found')</script>
+	http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script> 
