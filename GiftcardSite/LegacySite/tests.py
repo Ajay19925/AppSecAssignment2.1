@@ -27,7 +27,7 @@ class TestResponse(TestCase):
 		#print(response.content)
 		#self.assertnotContains(response, "XSS Vulnerability Found")
 		#self.assertTrue("XSS Vulnerability Found" in response.content)
-		self.assertContains(response, "&lt;script&gt;alert(XSS Vulnerability Found)&lt;/script&gt;", status_code=200)
+        self.assertContains(response, "&lt;script&gt;alert(XSS Vulnerability Found)&lt;/script&gt;", status_code=200)
 
 
 	def test_SQL_Injection(self):
