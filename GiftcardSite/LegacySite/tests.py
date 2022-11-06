@@ -28,6 +28,22 @@ class TestResponse(TestCase):
 		#self.assertnotContains(response, "XSS Vulnerability Found")
 		#self.assertTrue("XSS Vulnerability Found" in response.content)
 		self.assertContains(response, "&lt;script&gt;alert(XSS Vulnerability Found)&lt;/script&gt;", status_code=200)
+	
+	def test_csrf_attack(self):
+		#Registered user sending his card to another user
+		test = Client(enforce_csrf_checks=True)
+		test.post(reverse('Register'), {'uname': 'admin', 'pword': 'password1', 'pword2': 'password1'})
+		test.post(reverse('Login'), {'uname': 'testuser1', 'pword': 'password1'})
+		Product.objects.create(product_name="Columbia_Apparel Card 2", product_image_path="/images/product_8.jpg",recommended_price="80", description="Stocks")
+		data = {'amount': '80', 'username': 'fare'}
+		response = test.post("/gift.html", data)
+		assert(response.status_code != 200)
+		#Non-registered user sending a card to another user 
+		test1 = Client(enforce_csrf_checks=True)
+		Product.objects.create(product_name="Columbia_Apparel Card 3", product_image_path="/images/product_9.jpg",recommended_price="70", description="Stocks")
+		data = {'amount': '70', 'username': 'test'}
+		response2 = test1.post("/gift.html", data)
+		assert(response2.status_code != 200)
 
 	def test_SQL_Injection(self):
 		self.client.post(reverse('Register'), {'uname': 'testuser1', 'pword': 'password1', 'pword2': 'password1'})

@@ -15,7 +15,7 @@ XSS (Cross-Site Scripting) Vulnerability:
 	http://127.0.0.1:8000/buy.html?director=<script>alert('XSS Vulnerability Found')</script>
 	http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script> 
 
-SQL Injection:
+SQL Injection Attack:
 
 	By checking the code I found SQL injection vulnerability in 'use_card_view' function of views.py. Vulnerable code is present in 'GiftcardSite\LegacySite\views.py' (line 197)
 
@@ -36,3 +36,30 @@ SQL Injection:
 
 	Vulnerable payload:
 	sqlInjection.gftcrd
+
+CSRF (Cross-Site Request Forgery) Attack:
+
+	I found that Gift card form doesn't send CSRF token for validation while performing a POST request. Vulnerable code is present in 'GiftcardSite\templates\gift.html' (line 78)
+
+	Reason for the issue:
+	Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on a web application in which they are currently authenticated. This site don't have any CSRF protection. Using XSS vulnerability already present in the site, attacker can send a forged post request and make the user to buy a gift card for the attacker by a single button click or with URL link access while the session is active on the site.
+
+	Steps to reproduce the issue:
+	We already know that there is a XSS vulnerability in 'http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script>'. I just forged the URL with POST request as below
+	
+	127.0.0.1:8000/gift?director=<script>var xhr = new XMLHttpRequest(); xhr.open("POST", "/gift/0", true);var data = new FormData(); data.append('username','admin'); data.append('amount',3333); xhr.send(data);</script>
+	
+	In my case i logged in as user 'test' and clicked the above link to post a request to send gift card to user 'admin'. There is also another way to replicate this issue, we can use burp suite tool to intercept the connection and modify it befor posting it. Its kind of man in the middle attack using site vulnerability
+
+	Fix:
+	We need add csrf_protector in 'GiftcardSite\LegacySite\views.py and need to add {% csrf_token %} in vulnerable form where the post request exists (/gift/0) which is in 'GiftcardSite\templates\gift.html' (line 78).
+	In my test case i have handled two cases. 1. Registered user send card to another user and 2.Non registered user sending card to another user. 
+	
+	Vulnerable code or request:
+	POST request-/gift/0, parameter-username and amount
+
+	Vulnerable Payload:
+	CSRF.html
+
+
+	
