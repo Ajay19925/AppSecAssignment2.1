@@ -10,11 +10,11 @@ import io
 
 class TestResponse(TestCase):
 	def setup(self):
-		self.client= Client()
+        self.client= Client()
 
-	def test_xss_gift(self):
+    def test_xss_gift(self):
         prouct1 = Product.objects.create(product_name = 'test', product_image_path= 'test', recommended_price = 1, description = 'test')
-		response = self.client.get('/gift' , {'director' : '<script>alert(''XSS Vulnerability Found'')</script>'})
+        response = self.client.get('/gift' , {'director' : '<script>alert(''XSS Vulnerability Found'')</script>'})
 		#print(response.content)
 		#self.assertnotContains(response, "XSS Vulnerability Found")
 		#self.assertTrue("XSS Vulnerability Found" in response.content)
@@ -22,8 +22,8 @@ class TestResponse(TestCase):
 		self.assertContains(response, "&lt;script&gt;alert(XSS Vulnerability Found)&lt;/script&gt;", status_code=200)
 
 	def test_xss_buy(self):
-		prouct1 = Product.objects.create(product_name = 'test', product_image_path= 'test', recommended_price = 1, description = 'test')
-		response = self.client.get('/buy' , {'director' : '<script>alert(''XSS Vulnerability Found'')</script>'})
+        prouct1 = Product.objects.create(product_name = 'test', product_image_path= 'test', recommended_price = 1, description = 'test')
+        response = self.client.get('/buy' , {'director' : '<script>alert(''XSS Vulnerability Found'')</script>'})
 		#print(response.content)
 		#self.assertnotContains(response, "XSS Vulnerability Found")
 		#self.assertTrue("XSS Vulnerability Found" in response.content)
