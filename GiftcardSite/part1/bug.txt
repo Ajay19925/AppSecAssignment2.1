@@ -1,12 +1,14 @@
-XSS (Cross-Site Scripting) Vulnerability:
+TestCases for all the attacks will be available in 'GiftcardSite\LegacySite\tests.py' 
 
-	I found two XSS vulnerability in different part of the application. Vulnerable code in present in 'GiftcardSite\templates\item-single.html' (line 62) and 'GiftcardSite\templates\gift.html' (line 60).
+XSS (Cross-Site Scripting) Vulnerability:
+----------------------------------------
+	I found two XSS vulnerabilities in different parts of the application. Vulnerable code is present in 'GiftcardSite\templates\item-single.html' (line 62) and 'GiftcardSite\templates\gift.html' (line 60).
 
 	Reason for the issue:
-	Author used safe tag in two different places. The main use of safe tag is to intidicate that the value is known to be dsafe and therefore doesnt need to be escaped. This let the attacker to inject script using parameter 'director'
+	The author used a safe tag in two different places. The primary use of safe tag is to indicate that the value is known to be safe and therefore doesn't need to be escaped. This let the attacker to inject script using the parameter 'director'
 
 	Fix:
-	We have removed the safe tag in 'GiftcardSite\templates\item-single.html' (line 62) and 'GiftcardSite\templates\gift.html' (line 60).
+	We have removed the safe tag from 'GiftcardSite\templates\item-single.html' (line 62) and 'GiftcardSite\templates\gift.html' (line 60).
 
 	Vulnerable code:
 	<p>Endorsed by {{director|safe}}!</p>
@@ -16,18 +18,18 @@ XSS (Cross-Site Scripting) Vulnerability:
 	http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script> 
 
 SQL Injection Attack:
-
+--------------------
 	By checking the code I found SQL injection vulnerability in 'use_card_view' function of views.py. Vulnerable code is present in 'GiftcardSite\LegacySite\views.py' (line 197)
 
 	Reason for the issue:
-	SQL injection is a code injection attack that allows an attacker to interface with the queries that an application makes to its database. Author doesn't handled the signature value of the gift card properly. 
+	SQL injection is a code injection attack that allows an attacker to interface with the queries that an application makes to its database. The author of the site doesn't handled the signature value of the gift card properly. 
 
 	Steps to reproduce:
 	Download a card from the site -> Modify the giftcard file (put inject query in signature part) -> navigate to 'http://127.0.0.1:8000/use.html' -> upload the modified giftcard file.
-	password will be displayed in the screen with respect to your injection query.
+	password will be displayed on the screen with respect to your injection query.
 
 	Fix:
-	We need to use parameterized query instead of a direct query. Below mentioned vulnerable code can replaced with
+	We need to use parameterized query instead of a direct query. Below mentioned vulnerable code can be replaced with
 	card_query = Card.objects.raw('select id from LegacySite_card where data = %s', signature)
 	to fix the vulnerability.
 
@@ -38,28 +40,46 @@ SQL Injection Attack:
 	sqlInjection.gftcrd
 
 CSRF (Cross-Site Request Forgery) Attack:
-
-	I found that Gift card form doesn't send CSRF token for validation while performing a POST request. Vulnerable code is present in 'GiftcardSite\templates\gift.html' (line 78)
+----------------------------------------
+	I found that Gift card form doesn't send CSRF tokens for validation while performing a POST request. Vulnerable code is present in 'GiftcardSite\templates\gift.html' (line 78)
 
 	Reason for the issue:
-	Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on a web application in which they are currently authenticated. This site don't have any CSRF protection. Using XSS vulnerability already present in the site, attacker can send a forged post request and make the user to buy a gift card for the attacker by a single button click or with URL link access while the session is active on the site.
+	Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on a web application in which they are currently authenticated. This site doesn't have any CSRF protection. Using XSS vulnerability already present in the site,an attacker can send a forged post request and make the user to buy a gift card for the attacker by a single button click or with URL link access while the session is active on the site.
 
 	Steps to reproduce the issue:
-	We already know that there is a XSS vulnerability in 'http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script>'. I just forged the URL with POST request as below
+	We already know that there is an XSS vulnerability in 'http://127.0.0.1:8000/gift.html?director=<script>alert('XSS Vulnerability Found')</script>'. I just forged the URL with POST request as below
 	
 	127.0.0.1:8000/gift?director=<script>var xhr = new XMLHttpRequest(); xhr.open("POST", "/gift/0", true);var data = new FormData(); data.append('username','admin'); data.append('amount',3333); xhr.send(data);</script>
 	
-	In my case i logged in as user 'test' and clicked the above link to post a request to send gift card to user 'admin'. There is also another way to replicate this issue, we can use burp suite tool to intercept the connection and modify it befor posting it. Its kind of man in the middle attack using site vulnerability
+	In my case, i logged in as user 'test' and clicked the above link to post a request to send gift card to user 'admin'. There is also another way to replicate this issue, we can use burp suite tool to intercept the connection and modify it befor posting it. Its kind of man in the middle attack using site vulnerability
 
 	Fix:
-	We need add csrf_protector in 'GiftcardSite\LegacySite\views.py and need to add {% csrf_token %} in vulnerable form where the post request exists (/gift/0) which is in 'GiftcardSite\templates\gift.html' (line 78).
-	In my test case i have handled two cases. 1. Registered user send card to another user and 2.Non registered user sending card to another user. 
+	We need to add csrf_protector in 'GiftcardSite\LegacySite\views.py' and need to add {% csrf_token %} in vulnerable form where the post request exists (/gift/0) which is in 'GiftcardSite\templates\gift.html' (line 78).
+	In my test case, i have handled two cases. 1. Registered user sends card to another user and 2.Non registered user sending card to another user. 
 	
 	Vulnerable code or request:
 	POST request-/gift/0, parameter-username and amount
 
 	Vulnerable Payload:
 	CSRF.html
+
+Password Salting Issue:
+----------------------
+	I used SQL injection vulnerability in the site to found that, when we created a user with same password then the hash value of the password is not changed. This indirectly means that author of the site is using the same salt for all the users. This will make the attackers life esay to crack the password.
+	
+	Reason for the issue:
+	On checking the code I could see the author of the site used the same SEED value to generate the salt of the password. Usually we need to use different salt for different users even then they use the same password. This Vulnerability will help the attacker to break the password hash using a Rainbow table or tool like 'John the ripper'.
+	
+	Steps to Reproduce the issue:
+	I created a test case in 'GiftcardSite\LegacySite\tests.py' (moved to test_password_salt.py), in which I registered two user with same password and using the SQLInjection vulnerability i extracted the HASH value of the password using UI. Then I compared the password hash value and found that both are same.
+
+	Fix:
+	To fix this issue we need to modify some code in 'GiftcardSite\LegacySite\extras.py'. We need to remove the code 'random.seed(SEED)' from 'generate_salt' function of extras.py file. And move the 'import random' to the top.
+	These changes will generate new salt everytime when we register a user.
+	
+	Vulnerable Payload:
+	test_password_salt.py (function)
+	We are not able to add this function in the test case as it was dependent on SQLinjection vulnerability. After fixing SQLInjection vulnerability this test case becomes invalid so we have added it in a separate file.
 
 
 	
