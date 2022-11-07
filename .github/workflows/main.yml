@@ -16,6 +16,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           cd GiftcardSite
+          export SECRET_KEY='kmgysa#fz+9(z1*=c0ydrjizk*7sthm2ga1z4=^61$cxcq8b$l'
           sudo pip3 install django
           sudo pip3 install django-cryptography
           python manage.py makemigrations LegacySite
