@@ -1,4 +1,5 @@
-TestCases for all the attacks will be available in 'GiftcardSite\LegacySite\tests.py' 
+TestCases for all the attacks will be found in 'GiftcardSite\LegacySite\tests.py'
+Code fixes for the below attack will be found in ''GiftcardSite\LegacySite\' directory files
 
 XSS (Cross-Site Scripting) Vulnerability:
 ----------------------------------------
@@ -80,6 +81,7 @@ Password Salting Issue:
 	Vulnerable Payload:
 	test_password_salt.py (function)
 	We are not able to add this function in the test case as it was dependent on SQLinjection vulnerability. After fixing SQLInjection vulnerability this test case becomes invalid so we have added it in a separate file.
+	We tested and added an alternative testcase. Please verify 'GiftcardSite\LegacySite\tests.py'
 
 
 	

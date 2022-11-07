@@ -1,7 +1,7 @@
 Encrypting the Database:
 -----------------------
 
-	Encrypting DB fields (Implementation):
+Encrypting DB fields (Implementation):
 	
 	For Database field encryption, I used a library called 'django-cryptography' (https://pypi.org/project/django-cryptography/). Using this library we can encrypt database fields using the API method.
 
@@ -15,3 +15,20 @@ Encrypting the Database:
 	Code Changes:
 		- Add 'from django_cryptography.fields import encrypt' on 'GiftcardSite\LegacySite\models.py' file
 		- Replace 'data = models.BinaryField(unique=True)' (line 40) by 'data = encrypt(models.BinaryField(unique=True))' 
+
+Key management (Implementation):
+
+	I found a 'SECRET_KEY' in 'GiftcardSite\GiftcardSite\settings.py' file. For testing purposes I commented 'SECRET_KEY = 'kmgysa#fz+9(z1*=c0ydrjizk*7sthm2ga1z4=^61$cxcq8b$l'' (line 24) on the settings file and executed the site. I received some errors. From the error and internet surfing, I found that 'This value [the SECRET_KEY setting] is the key to securing signed data – it is vital you keep this secure, or attackers could use it to generate their own signed values.'
+	We prefer not to store our key on the same server.	
+
+	Approach, Implementation and Testing:
+		- My approach is to store the secret key in the environment variable and make use of it in the application.
+		- Set the environmental variable using 'export SECRET_KEY='kmgysa#fz+9(z1*=c0ydrjizk*7sthm2ga1z4=^61$cxcq8b$l''
+		- Whenever the server is rebooted or restarted, we need to set this environmental variable in the server.
+		- In 'GiftcardSite\GiftcardSite\settings.py' file we can access the SECRET_KEY from the environmental variable.
+		- Make changes to the GithubActions file to add the environmental variable on startup.
+
+	Code Changes:
+		- Remove 'SECRET_KEY = 'kmgysa#fz+9(z1*=c0ydrjizk*7sthm2ga1z4=^61$cxcq8b$l'' from 'GiftcardSite\GiftcardSite\settings.py' (line 24)
+		- Add 'SECRET_KEY=os.getenv('SECRET_KEY')' on 'GiftcardSite\GiftcardSite\settings.py' file
+			

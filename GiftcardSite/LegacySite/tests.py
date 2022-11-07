@@ -49,12 +49,15 @@ class TestResponse(TestCase):
 		self.client.post(reverse('Register'), {'uname': 'testuser1', 'pword': 'password1', 'pword2': 'password1'})
 		self.client.post(reverse('Register'), {'uname': 'admin', 'pword': 'password1', 'pword2': 'password1'})
 		self.client.post(reverse('Login'), {'uname': 'testuser1', 'pword': 'password1'})
-        	#User1 = User.objects.create(username='testuser1', password='password1')
-        	#self.client.login(username = 'admin', password = password)
+        #User1 = User.objects.create(username='testuser1', password='password1')
+        #self.client.login(username = 'admin', password = password)
 		data = io.StringIO('{"merchant_id": "NYU Apparel Card", "customer_id": "test", "total_value": "1000", "records": [{"record_type": "amount_change", "amount_added": 2000, "signature": " \' union SELECT password from LegacySite_user where username = \'admin"}]}')
 		filename="sqlInjection.gftcrd"
 		response = self.client.post(reverse('Use a card'), {'card_data': data, 'filename' :filename, 'card_supplied': True, 'card_fname': 'test'},)
 		#print(response.content)
 		self.assertEqual(response.context.get('card_found', None), None)
 
+	def test_password_salt(self):
+		self.SALT_LEN = 10
+		self.assertNotEqual(extras.generate_salt(self.SALT_LEN), extras.generate_salt(self.SALT_LEN))
 
