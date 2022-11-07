@@ -3,13 +3,13 @@ Encrypting the Database:
 
 	Encrypting DB fields (Implementation):
 	
-	For Database field encyrption, I used library called 'django-cryptography' (https://pypi.org/project/django-cryptography/). Using this library we can encrypt database fields using API method.
+	For Database field encryption, I used a library called 'django-cryptography' (https://pypi.org/project/django-cryptography/). Using this library we can encrypt database fields using the API method.
 
 	Installation and Testing:
 		- pip install django-cryptography (Run the command to use the library)
 		- I encrypted the field 'data' in table 'Legacysite_card' by making code changes (data field will have information about gift card - sensitive info)
 		- I made certain changes in 'GiftcardSite\LegacySite\models.py' file to achieve the encryption.
-		- I queried database to confirm whether the encryption was succesful. 
+		- I queried the database to confirm whether the encryption was successful. 
 		- Please refer screenshot in '\GiftcardSite\part2\data_field_encryption.png' for the outcome.
 
 	Code Changes:

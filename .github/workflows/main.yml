@@ -17,6 +17,7 @@ jobs:
           cd ${{ github.workspace }}
           cd GiftcardSite
           sudo pip3 install django
+          sudo pip3 install django-cryptography
           python manage.py makemigrations LegacySite
           python manage.py makemigrations
           python manage.py migrate
